@@ -5,17 +5,15 @@
  */
 package com.presence.util;
 
-import com.presence.services.PresentityServlet;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.slf4j.LoggerFactory;
@@ -67,23 +65,56 @@ public class Utility {
         try {
 
             int counter = 0;
-            int keysCount = columns.length;
+            int keysCount = 0;
 
-            for (String retval : columns) {
-                logger.debug(retval);
+            ResultSetMetaData rsmd = rs.getMetaData();
+            if (columns != null) {
+                keysCount = columns.length;
+            } else {
+                keysCount = rsmd.getColumnCount();
+                columns = new String[keysCount];
+                for (int i = 0; i < columns.length; i++) {
+                    columns[i] = rsmd.getColumnLabel(i + 1);
+
+                }
+            }
+            int[] columnTypes = new int[keysCount];
+            for (int i = 0; i < columns.length; i++) {
+                columnTypes[i] = rsmd.getColumnType(i + 1);
             }
 
             logger.debug("Columns count: ", keysCount);
-            ResultSetMetaData rsmd = rs.getMetaData();
-            
 
             outputJson.append("[");//start array
 
             while (rs.next()) {
                 outputJson.append("{"); //start object
                 for (int i = 1; i <= keysCount; i++) {
-                    System.out.println("counter ***********" + counter + " " + columns[i - 1] + " type: "+ rsmd.getColumnType(i));
+                    System.out.println("counter ***********" + counter + " " + columns[i - 1] + " type: " + rsmd.getColumnType(i));
                     outputJson.append("\"").append(columns[i - 1]).append("\":");
+
+                    switch (columnTypes[i-1]) {
+                        case Types.INTEGER:
+                            outputJson.append(rs.getInt(i)).append(",");
+                            break;
+                        case Types.LONGVARBINARY:
+                            String val = rs.getString(i);
+                            System.out.println("*:"+val);
+                            if (val != null) {
+                                outputJson.append("\"").append(Utility.escape(val)).append("\",");
+                            } else {
+                                outputJson.append("\"\",");
+                            }
+                            break;
+                        default:
+                            val = rs.getString(i);
+                            if (val != null) {
+                                outputJson.append("\"").append(rs.getString(i)).append("\",");
+                            } else {
+                                outputJson.append("\"\",");
+                            }
+                    }
+/*
                     if (rsmd.getColumnType(i) == java.sql.Types.INTEGER) {
                         outputJson.append(rs.getInt(i)).append(",");
                     } else if (rsmd.getColumnType(i) == java.sql.Types.LONGVARBINARY) {
@@ -101,7 +132,7 @@ public class Utility {
                             outputJson.append("\"\",");
                         }
                     }
-
+*/
                 }
                 outputJson.setCharAt(outputJson.lastIndexOf(","), '}'); //remove last ',' and close object
                 outputJson.append(','); //add ',' for another object
@@ -119,9 +150,15 @@ public class Utility {
     public static String convertJSONToSQL(String input, String type) {
         Matcher m;
         if (SELECT.equalsIgnoreCase(type)) {
+            if (input == null) {
+                return "*";
+            }
             m = selectP.matcher(input);
             logger.debug("Building select keys");
         } else if (FILTER.equalsIgnoreCase(type)) {
+            if (input == null) {
+                return null;
+            }
             m = filterP.matcher(input);
             logger.debug("Building filters");
         } else {
@@ -209,7 +246,7 @@ public class Utility {
         }
         StringBuffer sb = new StringBuffer();
         escape(s, sb);
-        logger.debug("Escaped xml: {}",sb.toString());
+        logger.debug("Escaped xml: {}", sb.toString());
         return sb.toString();
     }
 

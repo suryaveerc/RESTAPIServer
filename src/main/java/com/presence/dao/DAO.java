@@ -10,6 +10,7 @@ import com.presence.util.Utility;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import org.slf4j.LoggerFactory;
 
@@ -27,7 +28,7 @@ public class DAO {
         PreparedStatement preparedStatement = null;
 
         try {
-            String sql = SQLBuilder.buildInsertQuery(tableName, Utility.tokenizeSingleJsonArray(keys) );
+            String sql = SQLBuilder.buildInsertQuery(tableName, Utility.tokenizeSingleJsonArray(keys));
             connection = DAOConnectionFactory.getConnection();
             preparedStatement = connection.prepareStatement(sql);
             status = preparedStatement.executeUpdate();
@@ -50,7 +51,7 @@ public class DAO {
         PreparedStatement preparedStatement = null;
 
         try {
-            String sql = SQLBuilder.buildUpdateQuery(tableName, Utility.convertJSONToSQL(keys,null), Utility.convertJSONToSQL(filters, Utility.FILTER));
+            String sql = SQLBuilder.buildUpdateQuery(tableName, Utility.convertJSONToSQL(keys, null), Utility.convertJSONToSQL(filters, Utility.FILTER));
             connection = DAOConnectionFactory.getConnection();
             preparedStatement = connection.prepareStatement(sql);
             status = preparedStatement.executeUpdate();
@@ -71,15 +72,12 @@ public class DAO {
 
         Connection connection = null;
         PreparedStatement preparedStatement = null;
-        StringBuilder outputJson = null;
         ResultSet resultSet = null;
 
         try {
             String selectKeys = Utility.convertJSONToSQL(keys, Utility.SELECT);
             logger.debug("selectkeys: {}", selectKeys);
-            for (String retval : selectKeys.split(",")) {
-                logger.debug(retval);
-            }
+
             String sql = SQLBuilder.buildSelectQuery(tableName, selectKeys, Utility.convertJSONToSQL(filters, Utility.FILTER));
             connection = DAOConnectionFactory.getConnection();
             preparedStatement = connection.prepareStatement(sql);
@@ -87,7 +85,20 @@ public class DAO {
             if (!resultSet.isBeforeFirst()) {
                 return null;
             }
-            return Utility.resultsetToJson(resultSet, selectKeys.split(","));
+//            ResultSetMetaData rsmd = resultSet.getMetaData();
+//            int columnsNumber = rsmd.getColumnCount();
+//
+//            while (resultSet.next()) {
+//                for (int i = 1; i <= columnsNumber; i++) {
+//                    if (i > 1) {
+//                        System.out.print(",  ");
+//                    }
+//                    String columnValue = resultSet.getString(i);
+//                    System.out.print(columnValue + " " + rsmd.getColumnName(i));
+//                }
+//                System.out.println("");
+//            }
+            return Utility.resultsetToJson(resultSet, selectKeys.equals("*")? null: selectKeys.split(","));
 
         } catch (SQLException e) {
             logger.error("Error while creating preparedstatement", e);

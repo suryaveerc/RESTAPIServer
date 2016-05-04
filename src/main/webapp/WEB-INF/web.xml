@@ -10,11 +10,11 @@
     </servlet>
     <servlet-mapping>
         <servlet-name>PresentityServlet</servlet-name>
-        <url-pattern>/presence/presentity</url-pattern>
+        <url-pattern>/presentity</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>SubscriptionServlet</servlet-name>
-        <url-pattern>/presence/subscription</url-pattern>
+        <url-pattern>/subscription</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>
