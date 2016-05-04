@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--Context antiJARLocking="true" path="/PresenceRepository"/-->
+<!--jdbcUrl="jdbc:mysql://192.168.99.100:32789/opensips" -->
+<Context path="/RESTAPIServer">
+    <Resource auth="Container" cachePrepStmts="true" defaultAutoCommit="true" driverClassName="com.mysql.jdbc.Driver" factory="com.zaxxer.hikari.HikariJNDIFactory" global="jdbc/presencedb" jdbcUrl="jdbc:mysql://192.168.99.100:32789/opensips" maxWaitMillis="10000" maximumPoolSize="20" name="jdbc/presencedb" password="root" prepStmtCacheSize="30" prepStmtCacheSqlLimit="500" removeAbandoned="true" removeAbandonedTimeout="300" type="javax.sql.DataSource" username="root"/>
+</Context>
