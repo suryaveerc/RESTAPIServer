@@ -17,13 +17,15 @@ import org.slf4j.LoggerFactory;
 public class SQLBuilder {
 private static final org.slf4j.Logger logger = LoggerFactory.getLogger(SQLBuilder.class);
     public static String buildSelectQuery(String tableName, String keys, String filter) {
+        //long start = System.nanoTime();
         StringBuilder query = new StringBuilder();
         if (filter != null) {
             query.append(SQLPredicates.SELECT).append(keys).append(SQLPredicates.FROM).append(tableName).append(SQLPredicates.WHERE).append(filter);
         } else {
             query.append(SQLPredicates.SELECT).append(keys).append(SQLPredicates.FROM).append(tableName);
         }
-        logger.debug("Select {}", query.toString());
+        //logger.debug("Select: {}", query.toString());
+    //logger.debug("buildSelectQuery time: {}",(float)(System.nanoTime() - start)/1000000);
         return query.toString();
     }
 
@@ -33,7 +35,7 @@ private static final org.slf4j.Logger logger = LoggerFactory.getLogger(SQLBuilde
         String keys = kv.get(0);
         String values =kv.get(1);
         query.append(SQLPredicates.INSERT).append(tableName).append(keys).append(SQLPredicates.VALUES).append(values);
-        logger.debug("Insert {}", query.toString());
+      //  logger.debug("Insert {}", query.toString());
         return query.toString();
     }
 
@@ -44,7 +46,7 @@ private static final org.slf4j.Logger logger = LoggerFactory.getLogger(SQLBuilde
         } else {
             query.append(SQLPredicates.UPDATE).append(tableName).append(SQLPredicates.SET).append(keys);
         }
-        logger.debug("Update {}",query.toString());
+     //  logger.debug("Update {}",query.toString());
         return query.toString();
     }
 
@@ -55,7 +57,7 @@ private static final org.slf4j.Logger logger = LoggerFactory.getLogger(SQLBuilde
         } else {
             query.append(SQLPredicates.DELETE).append(SQLPredicates.FROM).append(tableName);
         }
-        logger.debug("Delete {}"+query.toString());
+        //logger.debug("Delete {}"+query.toString());
         return query.toString();
     }
 }

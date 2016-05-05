@@ -32,7 +32,7 @@ public class DAO {
             connection = DAOConnectionFactory.getConnection();
             preparedStatement = connection.prepareStatement(sql);
             status = preparedStatement.executeUpdate();
-            logger.debug("{} Record inserted", status);
+            //logger.debug("{} Record inserted", status);
             return status;
         } catch (SQLException e) {
             logger.error("Error while creating preparedstatement", e);
@@ -55,7 +55,7 @@ public class DAO {
             connection = DAOConnectionFactory.getConnection();
             preparedStatement = connection.prepareStatement(sql);
             status = preparedStatement.executeUpdate();
-            logger.debug("{} Record updated", status);
+            //logger.debug("{} Record updated", status);
             return status;
         } catch (SQLException e) {
             logger.error("Error while creating preparedstatement", e);
@@ -69,20 +69,23 @@ public class DAO {
     }
 
     public static String select(String keys, String filters, String tableName) throws SQLException {
-
+//        long start = System.nanoTime();
         Connection connection = null;
         PreparedStatement preparedStatement = null;
         ResultSet resultSet = null;
 
         try {
             String selectKeys = Utility.convertJSONToSQL(keys, Utility.SELECT);
-            logger.debug("selectkeys: {}", selectKeys);
-
             String sql = SQLBuilder.buildSelectQuery(tableName, selectKeys, Utility.convertJSONToSQL(filters, Utility.FILTER));
+            
             connection = DAOConnectionFactory.getConnection();
+  //          logger.debug("getConnection time: {}",(float)(System.nanoTime() - start)/1000000);
             preparedStatement = connection.prepareStatement(sql);
+    //        logger.debug("prepareStatement time: {}",(float)(System.nanoTime() - start)/1000000);
             resultSet = preparedStatement.executeQuery();
+      //      logger.debug("executeQuery time: {}",(float)(System.nanoTime() - start)/1000000);
             if (!resultSet.isBeforeFirst()) {
+        //        logger.debug("DAO time: {}",(float)(System.nanoTime() - start)/1000000);
                 return null;
             }
 //            ResultSetMetaData rsmd = resultSet.getMetaData();
@@ -98,6 +101,7 @@ public class DAO {
 //                }
 //                System.out.println("");
 //            }
+          //  logger.debug("DAO time: {}",(float)(System.nanoTime() - start)/1000000);
             return Utility.resultsetToJson(resultSet, selectKeys.equals("*")? null: selectKeys.split(","));
 
         } catch (SQLException e) {

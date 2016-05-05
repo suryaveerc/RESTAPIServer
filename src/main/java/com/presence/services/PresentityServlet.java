@@ -35,16 +35,23 @@ public class PresentityServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        logger.debug(request.getParameter("filter"));
-        logger.debug(request.getParameter("key"));
+//        logger.debug(request.getParameter("filter"));
+//        logger.debug(request.getParameter("key"));
         try {
-            String outputJson = DAO.select(request.getParameter("key"), request.getParameter("filter"), "presentity");
+            long start = System.nanoTime();
+            String key = request.getParameter("key");
+            String filter = request.getParameter("filter");
+            
+            String outputJson = DAO.select(key, filter, "presentity");
+            //logger.debug("Total time: {}",(float)(System.nanoTime() - start)/1000000);
             PrintWriter out = response.getWriter();
+            
             response.setStatus(HttpServletResponse.SC_OK);
             response.setContentType("application/json");
             response.setCharacterEncoding("UTF-8");
             out.print(outputJson);
             out.flush();
+            logger.debug("Total time: {}",(float)(System.nanoTime() - start)/1000000);
         } catch (SQLException ex) {
             logger.error("Error while sending request to database", ex);
             response.sendError(500, "Server was unable to process the request.");
@@ -64,17 +71,19 @@ public class PresentityServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        long start = System.nanoTime();
         try {
             StringBuilder sb = new StringBuilder();
             String s;
             while ((s = request.getReader().readLine()) != null) {
                 sb.append(s);
             }
+            
             int status = DAO.insert(sb.toString(), "presentity");
             if (status > 0) {
                 response.setStatus(HttpServletResponse.SC_CREATED);
             }
-            //logger.debug(sb.toString());
+            logger.debug("Total time: {}",(float)(System.nanoTime() - start)/1000000);
         } catch (SQLException ex) {
             logger.error("Error while sending request to database", ex);
             response.sendError(500, "Server was unable to process the request.");
@@ -89,15 +98,17 @@ public class PresentityServlet extends HttpServlet {
     @Override
     protected void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         //super.doPut(request, response); //To change body of generated methods, choose Tools | Templates.
-        try {    
-            logger.debug(request.getParameter("filter"));
+      long start = System.nanoTime();
+        try {  
+            
+       //     logger.debug(request.getParameter("filter"));
             StringBuilder postData = new StringBuilder();
             String s;
             while ((s = request.getReader().readLine()) != null) {
                 postData.append(s);
             }
             int status = DAO.update(postData.toString(), request.getParameter("filter"), "presentity");
-            logger.debug("Return status {}.", status);
+     //       logger.debug("Return status {}.", status);
             /*RFC2616 If an existing resource is modified, either the 200 (OK)
             or 204 (No Content) response codes SHOULD be sent to indicate successful
             completion of the request. */
@@ -106,6 +117,7 @@ public class PresentityServlet extends HttpServlet {
             } else {
                 response.setStatus(HttpServletResponse.SC_OK);
             }
+              logger.debug("Total time: {}",(float)(System.nanoTime() - start)/1000000);
         } catch (SQLException ex) {
             logger.error("Error while sending request to database", ex);
             response.sendError(500, "Server was unable to process the request.");

@@ -61,6 +61,7 @@ public class Utility {
 //Ref: http://stackoverflow.com/a/7661573/3275095
 
     public static String resultsetToJson(ResultSet rs, String[] columns) throws SQLException {
+        long start = System.nanoTime();
         StringBuilder outputJson = new StringBuilder(500);
         try {
 
@@ -83,14 +84,14 @@ public class Utility {
                 columnTypes[i] = rsmd.getColumnType(i + 1);
             }
 
-            logger.debug("Columns count: ", keysCount);
+    //        logger.debug("Columns count: ", keysCount);
 
             outputJson.append("[");//start array
 
             while (rs.next()) {
                 outputJson.append("{"); //start object
                 for (int i = 1; i <= keysCount; i++) {
-                    System.out.println("counter ***********" + counter + " " + columns[i - 1] + " type: " + rsmd.getColumnType(i));
+      //              System.out.println("counter ***********" + counter + " " + columns[i - 1] + " type: " + rsmd.getColumnType(i));
                     outputJson.append("\"").append(columns[i - 1]).append("\":");
 
                     switch (columnTypes[i-1]) {
@@ -99,7 +100,6 @@ public class Utility {
                             break;
                         case Types.LONGVARBINARY:
                             String val = rs.getString(i);
-                            System.out.println("*:"+val);
                             if (val != null) {
                                 outputJson.append("\"").append(Utility.escape(val)).append("\",");
                             } else {
@@ -138,7 +138,8 @@ public class Utility {
                 outputJson.append(','); //add ',' for another object
             }
             outputJson.setCharAt(outputJson.lastIndexOf(","), ']'); //remove last ',' and close array
-            logger.debug("Generated JSON is: \n{}", outputJson);
+        //    logger.debug("Generated JSON is: \n{}", outputJson);
+    logger.debug("resultsetToJSON time: {}",(float)(System.nanoTime() - start)/1000000);
             return outputJson.toString();
         } catch (SQLException ex) {
             logger.error("Error while creating JSON from resultset ", ex);
@@ -148,21 +149,25 @@ public class Utility {
     }
 
     public static String convertJSONToSQL(String input, String type) {
+    //long start = System.nanoTime();
         Matcher m;
         if (SELECT.equalsIgnoreCase(type)) {
             if (input == null) {
+      //                      logger.debug("convertJSONToSQL time: {}",(float)(System.nanoTime() - start)/1000000);
+
                 return "*";
             }
             m = selectP.matcher(input);
-            logger.debug("Building select keys");
+    //        logger.debug("Building select keys");
         } else if (FILTER.equalsIgnoreCase(type)) {
             if (input == null) {
+        //        logger.debug("convertJSONToSQL time: {}",(float)(System.nanoTime() - start)/1000000);
                 return null;
             }
             m = filterP.matcher(input);
-            logger.debug("Building filters");
+      //      logger.debug("Building filters");
         } else {
-            logger.debug("Building others");
+        //    logger.debug("Building others");
             m = p.matcher(input);
         }
         StringBuffer sb = new StringBuffer(input.length());
@@ -170,7 +175,8 @@ public class Utility {
             m.appendReplacement(sb, FILTER.equalsIgnoreCase(type) ? filterReplacements.get(m.group()) : replacements.get(m.group()));
         }
         m.appendTail(sb);
-        logger.debug("JSON to SQL sub string: {}", sb.toString());
+        //logger.debug("JSON to SQL sub string: {}", sb.toString());
+        //logger.debug("convertJSONToSQL time: {}",(float)(System.nanoTime() - start)/1000000);
         return sb.toString();
     }
 
@@ -179,7 +185,7 @@ public class Utility {
         StringBuilder keys = new StringBuilder(500).append('(');
         StringBuilder values = new StringBuilder(500).append('(');
         for (Map.Entry<String, String> entry : keyValues.entrySet()) {
-            System.out.println("Key = " + entry.getKey() + ", Value = " + entry.getValue());
+            //System.out.println("Key = " + entry.getKey() + ", Value = " + entry.getValue());
             keys.append(entry.getKey()).append(',');
             values.append(entry.getValue()).append(',');
         }
@@ -187,14 +193,15 @@ public class Utility {
         values.setCharAt(values.lastIndexOf(","), ')'); //remove last',' and close bracket
         kv.add(keys.toString());
         kv.add(values.toString());
-        logger.debug("Generated keys string: {}", keys);
-        logger.debug("Generated values string: {}", values);
+//        logger.debug("Generated keys string: {}", keys);
+//        logger.debug("Generated values string: {}", values);
         return kv;
     }
 
     public static Map<String, String> tokenizeSingleJsonArray(String json) {
         Map<String, String> jsonMap = new HashMap<>();
         //json = json.replaceAll("[{|}]", "");
+    
         json = json.substring(json.indexOf('{') + 1, json.lastIndexOf('}'));
         String str = null;
         String key = null;
@@ -203,9 +210,7 @@ public class Utility {
         int firstIndexOfColon = 0;
         while (fullJson.hasMoreElements()) {
             str = fullJson.nextToken();
-
             firstIndexOfColon = str.indexOf("\":");
-
             key = str.substring(1, firstIndexOfColon);
             //val = str.substring(2 + firstIndexOfColon); //skip ":
             val = str.substring(firstIndexOfColon + 2); //taking values with quotes, easy to create insert string.
@@ -246,7 +251,6 @@ public class Utility {
         }
         StringBuffer sb = new StringBuffer();
         escape(s, sb);
-        logger.debug("Escaped xml: {}", sb.toString());
         return sb.toString();
     }
 
