@@ -35,7 +35,7 @@
         <appender-ref ref="STDOUT" />
     </logger>
     <!-- By default, the level of the root level is set to DEBUG -->
-    <root level="ERROR">
+    <root level="debug">
         <appender-ref ref="FILE" />
         <appender-ref ref="STDOUT" />
     </root>

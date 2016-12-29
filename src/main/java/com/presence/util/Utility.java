@@ -150,6 +150,7 @@ public class Utility {
 
     public static String convertJSONToSQL(String input, String type) {
     //long start = System.nanoTime();
+    
         Matcher m;
         if (SELECT.equalsIgnoreCase(type)) {
             if (input == null) {
@@ -158,16 +159,16 @@ public class Utility {
                 return "*";
             }
             m = selectP.matcher(input);
-    //        logger.debug("Building select keys");
+            logger.debug("Building select keys");
         } else if (FILTER.equalsIgnoreCase(type)) {
             if (input == null) {
         //        logger.debug("convertJSONToSQL time: {}",(float)(System.nanoTime() - start)/1000000);
                 return null;
             }
             m = filterP.matcher(input);
-      //      logger.debug("Building filters");
+            logger.debug("Building filters");
         } else {
-        //    logger.debug("Building others");
+            logger.debug("Building others");
             m = p.matcher(input);
         }
         StringBuffer sb = new StringBuffer(input.length());
@@ -175,7 +176,7 @@ public class Utility {
             m.appendReplacement(sb, FILTER.equalsIgnoreCase(type) ? filterReplacements.get(m.group()) : replacements.get(m.group()));
         }
         m.appendTail(sb);
-        //logger.debug("JSON to SQL sub string: {}", sb.toString());
+        logger.debug("JSON to SQL sub string: {}", sb.toString());
         //logger.debug("convertJSONToSQL time: {}",(float)(System.nanoTime() - start)/1000000);
         return sb.toString();
     }

@@ -30,14 +30,14 @@ public class SubscriptionServlet extends HttpServlet {
     //    logger.debug(request.getParameter("key"));
         long start = System.nanoTime();
         try {
-            String outputJson = DAO.select(request.getParameter("key"), request.getParameter("filter"), "active_watchers");
+            String outputJson = DAO.select(request.getParameter("keys"), request.getParameter("filter"), "active_watchers");
             PrintWriter out = response.getWriter();
             response.setStatus(HttpServletResponse.SC_OK);
             response.setContentType("application/json");
             response.setCharacterEncoding("UTF-8");
             out.print(outputJson);
             out.flush();
-              logger.debug("Total time: {}",(float)(System.nanoTime() - start)/1000000);
+         //     logger.debug("Total time: {}",(float)(System.nanoTime() - start)/1000000);
         } catch (SQLException ex) {
             logger.error("Error while sending request to database", ex);
             response.sendError(500, "Server was unable to process the request.");
@@ -68,8 +68,8 @@ public class SubscriptionServlet extends HttpServlet {
             if (status > 0) {
                 response.setStatus(HttpServletResponse.SC_CREATED);
             }
-              logger.debug("Total time: {}",(float)(System.nanoTime() - start)/1000000);
-            //logger.debug(sb.toString());
+           //   logger.debug("Total time: {}",(float)(System.nanoTime() - start)/1000000);
+            logger.debug(sb.toString());
         } catch (SQLException ex) {
             logger.error("Error while sending request to database", ex);
             response.sendError(500, "Server was unable to process the request.");
@@ -103,7 +103,7 @@ public class SubscriptionServlet extends HttpServlet {
             } else {
                 response.setStatus(HttpServletResponse.SC_OK);
             }
-              logger.debug("Total time: {}",(float)(System.nanoTime() - start)/1000000);
+          //    logger.debug("Total time: {}",(float)(System.nanoTime() - start)/1000000);
         } catch (SQLException ex) {
             logger.error("Error while sending request to database", ex);
             response.sendError(500, "Server was unable to process the request.");

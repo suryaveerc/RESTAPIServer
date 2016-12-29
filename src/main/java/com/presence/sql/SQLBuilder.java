@@ -24,7 +24,7 @@ private static final org.slf4j.Logger logger = LoggerFactory.getLogger(SQLBuilde
         } else {
             query.append(SQLPredicates.SELECT).append(keys).append(SQLPredicates.FROM).append(tableName);
         }
-        //logger.debug("Select: {}", query.toString());
+        logger.debug("Select: {}", query.toString());
     //logger.debug("buildSelectQuery time: {}",(float)(System.nanoTime() - start)/1000000);
         return query.toString();
     }
