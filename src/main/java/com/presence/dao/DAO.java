@@ -33,7 +33,7 @@ public class DAO {
             preparedStatement = connection.prepareStatement(sql);
             status = preparedStatement.executeUpdate();
             //logger.debug("{} Record inserted", status);
-            return status;
+  return status;          
         } catch (SQLException e) {
             logger.error("Error while creating preparedstatement", e);
             throw e;
@@ -65,6 +65,7 @@ public class DAO {
             throw e;
         } finally {
             DAOConnectionFactory.closeConnection(connection, preparedStatement, null);
+            return status;
         }
     }
 
